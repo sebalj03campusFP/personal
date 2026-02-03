@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Economia del Servidor</title>
+    <style>
+        /* Estilos Base */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; margin: 0; }
+        .container { max-width: 1400px; margin: 0 auto; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+
+        /* Barra de Controles */
+        .controls-wrapper { background: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        
+        .controls-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 15px; 
+            align-items: end;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 6px; }
+        .control-group label { font-weight: bold; font-size: 0.85em; color: #7f8c8d; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        input, select { padding: 10px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 0.95em; outline: none; background: white; transition: border 0.2s; }
+        input:focus, select:focus { border-color: #3498db; box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1); }
+
+        /* Botón Excel */
+        .btn-download { 
+            background-color: #27ae60; color: white; border: none; padding: 12px 20px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; 
+            transition: background 0.2s; 
+        }
+        .btn-download:hover { background-color: #219150; }
+
+        /* Tabla */
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 14px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #34495e; color: white; position: sticky; top: 0; font-weight: 600; white-space: nowrap; }
+        tr:hover { background-color: #f8f9fa; }
+
+        /* Estilos condicionales */
+        .row-unsellable { background-color: #fffbfb; } 
+
+        .price-buy { color: #d35400; font-weight: 700; }
+        .price-sell { color: #27ae60; font-weight: 700; }
+        .price-zero { color: #bdc3c7; font-style: italic; font-size: 0.9em; }
+
+        .badge { padding: 5px 10px; border-radius: 12px; font-size: 0.75em; font-weight: bold; display: inline-block; min-width: 80px; text-align: center; }
+        .badge-yes { background-color: #e8f8f5; color: #27ae60; border: 1px solid #d4efdf; }
+        .badge-no { background-color: #fdedec; color: #c0392b; border: 1px solid #fadbd8; }
+
+        .cat-badge { font-size: 0.8em; color: #555; background: #e9ecef; padding: 4px 8px; border-radius: 4px; border: 1px solid #dee2e6; }
+        
+        .stats-summary { margin-top: 10px; font-size: 0.9em; color: #7f8c8d; text-align: right; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>💎 Economia del Servidor</h1>
+
+    <div class="controls-wrapper">
+        <div class="controls-grid">
+            <div class="control-group">
+                <label>🔍 Buscar Ítem</label>
+                <input type="text" id="searchInput" placeholder="Nombre..." onkeyup="updateTable()">
+            </div>
+
+            <div class="control-group">
+                <label>📂 Categoria</label>
+                <select id="filterCategory" onchange="updateTable()">
+                    <option value="all">Todas las Categorías</option>
+                    </select>
+            </div>
+
+            <div class="control-group">
+                <label>💰 Venta </label>
+                <select id="filterSellStatus" onchange="updateTable()">
+                    <option value="all">Cualquiera</option>
+                    <option value="sellable">✅ Solo Vendibles</option>
+                    <option value="unsellable">⛔ Solo No Vendibles</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>🛒 Compra (Tú compras)</label>
+                <select id="filterBuyStatus" onchange="updateTable()">
+                    <option value="all">Cualquiera</option>
+                    <option value="buyable">✅ Solo Comprables</option>
+                    <option value="not_buyable">⛔ Solo No Comprables</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>🔃 Ordenar por</label>
+                <select id="sortOrder" onchange="updateTable()">
+                    <option value="name_asc">🔤 Nombre (A-Z)</option>
+                    <option value="sell_desc">⬆️ Precio Venta (Mayor)</option>
+                    <option value="buy_desc">⬆️ Precio Compra (Mayor)</option>
+                    <option value="cat_asc">📂 Categoría</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <button class="btn-download" onclick="downloadCSV()">📥 Descargar Excel</button>
+            </div>
+        </div>
+        <div class="stats-summary" id="resultsCount">Cargando...</div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="pricesTable">
+            <thead>
+                <tr>
+                    <th width="15%">Categoría</th>
+                    <th width="35%">Ítem</th>
+                    <th width="15%">Precio Compra</th>
+                    <th width="15%">Precio Venta</th>
+                    <th width="10%">Estado Venta</th>
+                    <th width="10%">Estado Compra</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="6" style="text-align:center; padding: 20px;">Cargando precios...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let allItems = []; 
+    let categoriesSet = new Set();
+
+    // --- 1. CARGA INICIAL ---
+    fetch('prices.json')
+        .then(response => response.json())
+        .then(data => {
+            // Procesar datos
+            allItems = Object.entries(data).map(([key, val]) => {
+                
+                // Aquí aplicamos la traducción de categorías
+                let rawCat = val.category || 'varios';
+                let niceCat = formatCategory(rawCat);
+
+                categoriesSet.add(niceCat); // Guardar categoría "bonita" para el filtro
+
+                return {
+                    id: key,
+                    name: formatName(key),
+                    category: niceCat, // Usamos la categoría formateada
+                    stack: val.stack,
+                    buy: val.unit_buy || 0,
+                    sell: val.unit_sell || 0
+                };
+            });
+
+            // Llenar el Select de Categorías
+            populateCategoryFilter();
+            
+            // Renderizar primera vez
+            updateTable();
+        })
+        .catch(err => {
+            document.getElementById('tableBody').innerHTML = 
+            '<tr><td colspan="6" style="color:red; text-align:center; font-weight:bold;">⚠️ Error: No se encuentra "prices.json"</td></tr>';
+        });
+
+    // Función para limpiar nombres de ítems
+    function formatName(raw) {
+        return raw.replace('minecraft:', '')
+                  .replace(/_/g, ' ')
+                  .replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    // --- NUEVA FUNCIÓN: TRADUCIR/FORMATEAR CATEGORÍAS ---
+    function formatCategory(raw) {
+        let cat = String(raw).toLowerCase();
+
+        // REGLA: "blocks.subcategoria" -> "Bloques Subcategoria"
+        if (cat.startsWith('blocks.')) {
+            // Quitamos los primeros 7 caracteres ("blocks.")
+            let sub = cat.substring(7);
+            // Reemplazamos guiones bajos por espacios y capitalizamos
+            sub = sub.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return `Bloques ${sub}`;
+        }
+
+        // Si no es un bloque, simplemente capitalizamos la primera letra de cada palabra
+        // (Ej: "food" -> "Food", "misc" -> "Misc")
+        return cat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    // --- 2. LLENAR FILTRO DE CATEGORÍAS ---
+    function populateCategoryFilter() {
+        const select = document.getElementById('filterCategory');
+        // Convertir Set a Array y ordenar alfabéticamente
+        const sortedCats = Array.from(categoriesSet).sort();
+        
+        sortedCats.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            select.appendChild(option);
+        });
+    }
+
+    // --- 3. LÓGICA DE FILTRADO MAESTRA ---
+    function updateTable() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const catFilter = document.getElementById('filterCategory').value;
+        const sellFilter = document.getElementById('filterSellStatus').value;
+        const buyFilter = document.getElementById('filterBuyStatus').value;
+        const sortMode = document.getElementById('sortOrder').value;
+
+        // FILTRAR
+        let filtered = allItems.filter(item => {
+            // 1. Texto (Nombre)
+            if (!item.name.toLowerCase().includes(search)) return false;
+
+            // 2. Categoría
+            if (catFilter !== 'all' && item.category !== catFilter) return false;
+
+            // 3. Estado Venta
+            if (sellFilter === 'sellable' && item.sell <= 0) return false;
+            if (sellFilter === 'unsellable' && item.sell > 0) return false;
+
+            // 4. Estado Compra
+            if (buyFilter === 'buyable' && item.buy <= 0) return false;
+            if (buyFilter === 'not_buyable' && item.buy > 0) return false;
+
+            return true;
+        });
+
+        // ORDENAR
+        filtered.sort((a, b) => {
+            switch (sortMode) {
+                case 'name_asc': return a.name.localeCompare(b.name);
+                case 'cat_asc': return a.category.localeCompare(b.category) || a.name.localeCompare(b.name);
+                case 'sell_desc': return b.sell - a.sell;
+                case 'buy_desc': return b.buy - a.buy;
+                default: return 0;
+            }
+        });
+
+        document.getElementById('resultsCount').innerText = `Mostrando ${filtered.length} ítems`;
+        renderRows(filtered);
+    }
+
+    // --- 4. RENDERIZADO HTML ---
+    function renderRows(items) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        if (items.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No hay resultados con esos filtros.</td></tr>';
+            return;
+        }
+
+        items.forEach(item => {
+            const isSellable = item.sell > 0;
+            const isBuyable = item.buy > 0;
+            
+            const badgeSell = isSellable 
+                ? '<span class="badge badge-yes">VENDIBLE</span>' 
+                : '<span class="badge badge-no">NO VENDIBLE</span>';
+            
+            const badgeBuy = isBuyable
+                ? '<span class="badge badge-yes">COMPRABLE</span>'
+                : '<span class="badge badge-no">NO COMPRABLE</span>';
+
+            const buyDisplay = isBuyable ? `<span class="price-buy">$${item.buy}</span>` : '<span class="price-zero">-</span>';
+            const sellDisplay = isSellable ? `<span class="price-sell">$${item.sell}</span>` : '<span class="price-zero">-</span>';
+
+            const tr = document.createElement('tr');
+            if (!isSellable) tr.classList.add('row-unsellable');
+
+            tr.innerHTML = `
+                <td><span class="cat-badge">${item.category}</span></td>
+                <td>
+                    <b>${item.name}</b>
+                    <div style="font-size:0.8em; color:#888;">Stack: ${item.stack}</div>
+                </td>
+                <td>${buyDisplay}</td>
+                <td>${sellDisplay}</td>
+                <td>${badgeSell}</td>
+                <td>${badgeBuy}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // --- 5. EXPORTAR CSV ---
+    function downloadCSV() {
+        let csv = "\uFEFFCategoría;Ítem;ID;Precio Compra;Precio Venta;Estado Venta;Estado Compra\n";
+        
+        allItems.forEach(item => {
+            let sStatus = item.sell > 0 ? "VENDIBLE" : "NO VENDIBLE";
+            let bStatus = item.buy > 0 ? "COMPRABLE" : "NO COMPRABLE";
+            csv += `${item.category};${item.name};${item.id};${item.buy};${item.sell};${sStatus};${bStatus}\n`;
+        });
+
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let url = URL.createObjectURL(blob);
+        let link = document.createElement("a");
+        link.href = url;
+        link.download = "economia_full.csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+
+</body>
+</html>
