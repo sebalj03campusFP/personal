@@ -6063,7 +6063,7 @@
     "category": "ores",
     "stack": 64,
     "unit_buy": 900,
-    "unit_sell": 270
+    "unit_sell": 75
   },
   "minecraft:deepslate_emerald_ore": {
     "category": "ores",
@@ -6087,13 +6087,13 @@
     "category": "ores",
     "stack": 64,
     "unit_buy": 540,
-    "unit_sell": 100
+    "unit_sell": 35
   },
   "minecraft:raw_gold_block": {
     "category": "ores",
     "stack": 64,
     "unit_buy": 0,
-    "unit_sell": 34
+    "unit_sell": 9
   },
   "minecraft:deepslate_gold_ore": {
     "category": "ores",
@@ -6123,7 +6123,7 @@
     "category": "ores",
     "stack": 64,
     "unit_buy": 60,
-    "unit_sell": 5
+    "unit_sell": 1
   },
   "minecraft:iron_block": {
     "category": "ores",
@@ -6135,7 +6135,7 @@
     "category": "ores",
     "stack": 64,
     "unit_buy": 0,
-    "unit_sell": 31
+    "unit_sell": 18
   },
   "minecraft:deepslate_iron_ore": {
     "category": "ores",
@@ -6273,7 +6273,7 @@
     "category": "plants",
     "stack": 64,
     "unit_buy": 0,
-    "unit_sell": 1
+    "unit_sell": 0
   },
   "minecraft:cocoa_beans": {
     "category": "plants",
@@ -7947,7 +7947,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 30,
-    "unit_sell": 9
+    "unit_sell": 0
   },
   "minecraft:copper_axe": {
     "category": "tools",
@@ -7959,7 +7959,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 842,
-    "unit_sell": 253
+    "unit_sell": 0
   },
   "minecraft:golden_axe": {
     "category": "tools",
@@ -7977,7 +7977,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 3092,
-    "unit_sell": 928
+    "unit_sell": 0
   },
   "minecraft:stone_axe": {
     "category": "tools",
@@ -8001,7 +8001,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 562,
-    "unit_sell": 169
+    "unit_sell": 0
   },
   "minecraft:golden_hoe": {
     "category": "tools",
@@ -8019,7 +8019,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 2842,
-    "unit_sell": 853
+    "unit_sell": 0
   },
   "minecraft:stone_hoe": {
     "category": "tools",
@@ -8043,7 +8043,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 842,
-    "unit_sell": 253
+    "unit_sell": 0
   },
   "minecraft:golden_pickaxe": {
     "category": "tools",
@@ -8061,7 +8061,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 3092,
-    "unit_sell": 928
+    "unit_sell": 0
   },
   "minecraft:stone_pickaxe": {
     "category": "tools",
@@ -8085,7 +8085,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 282,
-    "unit_sell": 85
+    "unit_sell": 0
   },
   "minecraft:golden_shovel": {
     "category": "tools",
@@ -8103,7 +8103,7 @@
     "category": "tools",
     "stack": 1,
     "unit_buy": 2592,
-    "unit_sell": 778
+    "unit_sell": 0
   },
   "minecraft:stone_shovel": {
     "category": "tools",
@@ -8649,7 +8649,7 @@
     "category": "utility",
     "stack": 64,
     "unit_buy": 856,
-    "unit_sell": 257
+    "unit_sell": 16
   },
   "minecraft:loom": {
     "category": "utility",
@@ -9459,7 +9459,7 @@
     "category": "weapons",
     "stack": 1,
     "unit_buy": 2841,
-    "unit_sell": 852
+    "unit_sell": 0
   },
   "minecraft:stone_sword": {
     "category": "weapons",
