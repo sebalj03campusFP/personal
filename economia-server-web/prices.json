@@ -2451,7 +2451,7 @@
     "category": "drops",
     "stack": 64,
     "unit_buy": 25,
-    "unit_sell": 8
+    "unit_sell": 1
   },
   "minecraft:nautilus_shell": {
     "category": "drops",
@@ -5403,7 +5403,7 @@
     "category": "blocks.nether",
     "stack": 64,
     "unit_buy": 100,
-    "unit_sell": 30
+    "unit_sell": 4
   },
   "minecraft:nether_sprouts": {
     "category": "blocks.nether",
